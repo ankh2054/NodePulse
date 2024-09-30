@@ -3,7 +3,7 @@
     "axios": "^1.7.7"
   },
   "name": "@sentnl/nodepulse",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "NodePulse is a lightweight JavaScript library designed to help developers maintain and utilize a list of healthy nodes (Currently it supports Hyperion and Atomic API nodes). The library connects to an API that provides a list of healthy nodes, which it regularly refreshes, and can fallback to a predefined list of default nodes in case of API failure.",
   "main": "NodePulse.js",
   "devDependencies": {},
@@ -19,5 +19,9 @@
   "files": [
     "NodePulse.js",
     "README.md"
-  ]
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ankh2054/NodePulse.git"
+  }
 }

@@ -201,3 +201,77 @@ Parameters:
 
 	•	fallbackType: A string indicating the fallback type. It can either be 'existing' (using the existing node list) or 'default' (using the default nodes).
 	•	nodes: The list of fallback node URLs.
+
+
+
+## Logging Options
+
+NodePulse provides flexible logging options to help you debug and monitor its operation. You can control the verbosity of logs and even use a custom logger.
+
+### Log Levels
+
+NodePulse supports the following log levels, in order of increasing verbosity:
+
+1. error
+2. warn
+3. info
+4. debug
+
+### Configuring Logging
+
+You can configure logging by passing options when creating a NodePulse instance:
+
+```js
+const nodePulse = new NodePulse({
+  // ... other options ...
+  logLevel: 'info',
+  logger: customLogger // optional
+});
+```
+
+#### logLevel
+
+The `logLevel` option determines which messages are output. Messages at the specified level and above will be logged. For example, if you set `logLevel: 'warn'`, both 'warn' and 'error' messages will be output, but 'info' and 'debug' messages will be suppressed.
+
+Default value: 'warn'
+
+#### logger
+
+By default, NodePulse uses the console object for logging. You can provide a custom logger object to redirect logs to your preferred logging system. The custom logger should implement methods corresponding to the log levels (error, warn, info, debug).
+
+Default value: console
+
+### Examples
+
+1. Increase verbosity to include info messages:
+
+```js
+const nodePulse = new NodePulse({
+  logLevel: 'info'
+});
+```
+
+2. Use a custom logger:
+
+```js
+const customLogger = {
+  error: (message) => { /* custom error logging */ },
+  warn: (message) => { /* custom warn logging */ },
+  info: (message) => { /* custom info logging */ },
+  debug: (message) => { /* custom debug logging */ }
+};
+
+const nodePulse = new NodePulse({
+  logger: customLogger
+});
+```
+
+3. Suppress all logs except errors:
+
+```js
+const nodePulse = new NodePulse({
+  logLevel: 'error'
+});
+```
+
+By using these logging options, you can fine-tune the output of NodePulse to suit your development and production needs.
