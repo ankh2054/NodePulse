@@ -8,7 +8,10 @@ class NodePulse {
       nodeCount: options.nodeCount || 3,
       updateInterval: options.updateInterval || 30000,
       apiUrl: options.apiUrl || 'http://127.0.0.1:3000/nodes',
+      logLevel: options.logLevel || 'warn', // Add this line
     };
+
+    this.logger = options.logger || console; // Add this line
 
     this.nodes = [];
     this.currentNodeIndex = 0;
@@ -39,16 +42,16 @@ class NodePulse {
       },
     };
 
-    this.updateNodes();
+    this.hooks = {
+      onNodeUpdate: options.onNodeUpdate || (() => {}),
+      onError: options.onError || (() => {}),
+      onFallback: options.onFallback || (() => {}),
+    };
+
+    this.nodesReady = false;
+    this.nodesPromise = this.updateNodes();
     setInterval(() => this.updateNodes(), this.options.updateInterval);
   }
-  // Refresh nodelist method
-  async refreshNodes() {
-    console.log('Manually refreshing nodes...');
-    await this.updateNodes();
-    console.log('Node refresh complete.');
-  }
-
 
   async updateNodes() {
     const maxRetries = 3;
@@ -66,13 +69,17 @@ class NodePulse {
 
         if (response.status === 200 && response.data && response.data.length > 0) {
           this.nodes = response.data.map(node => node.url);
-          console.log('Updated nodes:', this.nodes);
+          this.log('info', 'Updated nodes:', this.nodes);
+          this.hooks.onNodeUpdate(this.nodes);
+          this.nodesReady = true;
           return; // Success, exit the function
         } else {
-          console.warn(`Attempt ${retries + 1}: No nodes received or unexpected response.`);
+          this.log('warn', `Attempt ${retries + 1}: No nodes received or unexpected response.`);
+          this.hooks.onError(new Error('No nodes received or unexpected response'));
         }
       } catch (error) {
-        console.error(`Attempt ${retries + 1}: Failed to fetch nodes:`, error.message);
+        this.log('error', `Attempt ${retries + 1}: Failed to fetch nodes:`, error.message);
+        this.hooks.onError(error);
       }
 
       retries++;
@@ -84,22 +91,39 @@ class NodePulse {
     // If all retries fail, keep existing nodes if available, otherwise use default nodes
     if (this.nodes.length > 0) {
       console.warn('All attempts to fetch nodes failed, keeping existing nodes.');
+      this.hooks.onFallback('existing', this.nodes);
     } else {
       console.warn('All attempts to fetch nodes failed, using default nodes.');
       this.nodes = this.defaultNodes[this.options.nodeType][this.options.network];
+      this.hooks.onFallback('default', this.nodes);
     }
   }
 
-  // Get node method
+  async getNode() {
+    if (!this.nodesReady) {
+      await this.nodesPromise;
+    }
 
-  getNode() {
     if (this.nodes.length === 0) {
-      this.updateNodes();
+      await this.updateNodes();
     }
 
     const node = this.nodes[this.currentNodeIndex];
     this.currentNodeIndex = (this.currentNodeIndex + 1) % this.nodes.length;
     return node;
+  }
+
+  async waitForNodes() {
+    if (!this.nodesReady) {
+      await this.nodesPromise;
+    }
+  }
+
+  log(level, ...args) {
+    const levels = ['error', 'warn', 'info', 'debug'];
+    if (levels.indexOf(level) <= levels.indexOf(this.options.logLevel)) {
+      this.logger[level](...args);
+    }
   }
 }
 
