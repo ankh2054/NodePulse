@@ -1,6 +1,8 @@
 # NodePulse Documentation
 
-NodePulse is a lightweight JavaScript library designed to help developers maintain and utilize a list of healthy nodes (Currently it supports Hyperion and Atomic API nodes). The library connects to an API that provides a list of healthy nodes, which it regularly refreshes, and can fallback to a predefined list of default nodes in case of API failure.
+NodePulse is a lightweight JavaScript library designed to help developers maintain and utilize a list of healthy nodes (Currently it supports Hyperion and Atomic API nodes). The library connects to an Cloudflare Load Balanced API (Which in turn connects to 3 backend APIs running on different cloud platforms) that provides a list of healthy nodes, which it regularly refreshes, and falls back to a predefined list of default nodes in case of not being able to contact any of the backends. 
+
+For now only the WAX network is supported.
 
 ## Features
 
@@ -8,6 +10,7 @@ NodePulse is a lightweight JavaScript library designed to help developers mainta
 - **Real-time Node Discovery**: Dynamically finds and connects to available nodes
 - **Fault Tolerance**: Maintains network integrity even if some nodes fail
 - **Custom Default Nodes**: Allows overriding of default nodes for specific node types and networks
+- **Network Supported**: WAX 
 
 ## Usage
 
@@ -20,6 +23,8 @@ npm install @sentnl/nodepulse
 ### Basic Example
 
 **Here’s an example of how to use NodePulse to retrieve a healthy node from the list:**
+
+By Default it will provide you with 3 healthy Hyperion Mainnet nodes, to choose atomic and or testnet nodes you need to use custom options.
 
 ```js
 const NodePulse = require('@sentnl/nodepulse');
@@ -37,12 +42,12 @@ console.log(`Using node: ${node}`);
 
 You can customize the behavior of NodePulse by passing an options object when creating an instance. Available options include:
 
-	•	nodeType: Type of nodes to use ('hyperion' or 'atomic').
-	•	network: Network to use ('mainnet' or 'testnet').
-	•	nodeCount: Number of nodes to retrieve from the API.
-	•	updateInterval: How often (in milliseconds) to refresh the node list.
-	•	apiUrl: The API URL to fetch healthy nodes.
-	•	defaultNodes: Custom default nodes to use as fallback.
+	•	nodeType: Type of nodes to use ('hyperion' or 'atomic'). Default is hyperion
+	•	network: Network to use ('mainnet' or 'testnet'). Default is mainnet
+	•	nodeCount: Number of nodes to retrieve from the API. Defaults is 3
+	•	updateInterval: How often (in milliseconds) to refresh the node list. Defaults is 30 seconds
+	•	apiUrl: The API URL to fetch healthy nodes. Defaults is http://nodepulse.sentnl.io/nodes
+	•	defaultNodes: Custom default nodes to use as fallback. 
 
 
 
@@ -81,7 +86,7 @@ console.log(`Using node: ${node}`);
 
 ### constructor(options)
 
-The constructor initializes the NodePulse instance. It accepts an options object to configure the behavior of the node-fetching mechanism.
+The constructor initializes the NodePulse instance. 
 
 Parameters:
 
