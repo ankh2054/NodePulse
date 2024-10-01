@@ -1,4 +1,4 @@
-# NodePulse Documentation
+# NodePulse 
 
 NodePulse is a lightweight JavaScript library designed to help developers maintain and utilize a list of healthy nodes (Currently it supports Hyperion and Atomic API nodes). The library connects to an Cloudflare Load Balanced API (Which in turn connects to 3 backend APIs running on different cloud platforms) that provides a list of healthy nodes, which it regularly refreshes, and falls back to a predefined list of default nodes in case of not being able to contact any of the backends. 
 
