@@ -2,15 +2,28 @@
 
 NodePulse is a lightweight JavaScript library designed to help developers maintain and utilize a list of healthy nodes (Currently it supports Hyperion and Atomic API nodes). The library connects to an API that provides a list of healthy nodes, which it regularly refreshes, and can fallback to a predefined list of default nodes in case of API failure.
 
+## Features
+
+- **GeoIP Integration**: Automatically connects you to geographically closest nodes
+- **Real-time Node Discovery**: Dynamically finds and connects to available nodes
+- **Fault Tolerance**: Maintains network integrity even if some nodes fail
+- **Custom Default Nodes**: Allows overriding of default nodes for specific node types and networks
 
 ## Usage
 
+
+### Install the package
+
+```bash
+npm install @sentnl/nodepulse
+```
 ### Basic Example
 
 **Here’s an example of how to use NodePulse to retrieve a healthy node from the list:**
 
 ```js
-const NodePulse = require('./nodePulse');
+const NodePulse = require('@sentnl/nodepulse');
+
 
 // Initialize NodePulse with default options
 const nodePulse = new NodePulse();
@@ -29,22 +42,33 @@ You can customize the behavior of NodePulse by passing an options object when cr
 	•	nodeCount: Number of nodes to retrieve from the API.
 	•	updateInterval: How often (in milliseconds) to refresh the node list.
 	•	apiUrl: The API URL to fetch healthy nodes.
+	•	defaultNodes: Custom default nodes to use as fallback.
 
 
 
-**Example of using custom options:**
-
+**Example of using custom options with default node override:**
 
 ```js
-const NodePulse = require('./nodePulse');
+const NodePulse = require('@sentnl/nodepulse');
 
-// Initialize with custom options
+const customDefaultNodes = {
+  hyperion: {
+    mainnet: [
+      'https://wax.eosrio.io',
+      'https://api.waxsweden.org',
+      'https://wax.eu.eosamsterdam.net'
+    ]
+  }
+};
+
+// Initialize with custom options and default nodes
 const nodePulse = new NodePulse({
-  nodeType: 'atomic',
-  network: 'testnet',
+  nodeType: 'hyperion',
+  network: 'mainnet',
   nodeCount: 5,
   updateInterval: 60000, // Refresh every minute
   apiUrl: 'http://nodepulse.sentnl.io/nodes',
+  defaultNodes: customDefaultNodes
 });
 
 // Retrieve a node from the custom configuration
@@ -67,14 +91,26 @@ Parameters:
 	•	nodeCount (number, default: 3): How many nodes to fetch from the API.
 	•	updateInterval (number, default: 30000): Interval for refreshing the node list, in milliseconds.
 	•	apiUrl (string, default: 'http://nodepulse.sentnl.io/nodes'): The API URL from which to fetch the healthy node list.  (For now Sentnl are the only ones running this, but we hope more providers will offer this service in the future.)
+	•	defaultNodes (object, optional): Custom default nodes to use as fallback.
 
 ```js
+const customDefaultNodes = {
+  hyperion: {
+    mainnet: [
+      'https://wax.eosrio.io',
+      'https://api.waxsweden.org',
+      'https://wax.eu.eosamsterdam.net'
+    ]
+  }
+};
+
 const nodePulse = new NodePulse({
-  nodeType: 'atomic',
-  network: 'testnet',
+  nodeType: 'hyperion',
+  network: 'mainnet',
   nodeCount: 3,
   updateInterval: 60000,
-  apiUrl: 'http://api.custom.com/nodes'
+  apiUrl: 'http://api.custom.com/nodes',
+  defaultNodes: customDefaultNodes
 });
 ```
 

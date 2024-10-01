@@ -1,15 +1,24 @@
 const NodePulse = require('../NodePulse');
 
+const customDefaultNodes = {
+  hyperion: {
+    mainnet: [
+      'https://wax.eosrio.io',
+      'https://api.waxsweden.org',
+      'https://wax.eu.eosamsterdam.net'
+    ]
+  }
+};
+
 const nodePulse = new NodePulse({
-    logLevel: 'info', //Sets logging to info 
-  });
+  defaultNodes: customDefaultNodes
+});
 
 async function example() {
   try {
-
     const node = await nodePulse.getNode();
     console.log('Using node:', node);
-
+    
     const response = await fetch(`${node}/v1/chain/get_info`);
     const chainInfo = await response.json();
     console.log('Chain info:', chainInfo);

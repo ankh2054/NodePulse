@@ -1,4 +1,4 @@
-const NodePulse = require('./NodePulse');
+const NodePulse = require('../NodePulse');
 
 const nodePulse = new NodePulse();
 

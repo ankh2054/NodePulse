@@ -8,14 +8,13 @@ class NodePulse {
       nodeCount: options.nodeCount || 3,
       updateInterval: options.updateInterval || 30000,
       apiUrl: options.apiUrl || 'http://127.0.0.1:3000/nodes',
-      logLevel: options.logLevel || 'warn', // Add this line
+      logLevel: options.logLevel || 'warn',
     };
 
-    this.logger = options.logger || console; // Add this line
+    this.logger = options.logger || console;
 
-    this.nodes = [];
-    this.currentNodeIndex = 0;
-    this.defaultNodes = {
+    // Deep merge custom default nodes with original defaults
+    this.defaultNodes = this.deepMerge({
       hyperion: {
         mainnet: [
           'https://wax.eosusa.news',
@@ -40,7 +39,10 @@ class NodePulse {
           'https://testatomic.waxsweden.org',
         ],
       },
-    };
+    }, options.defaultNodes || {});
+
+    this.nodes = [];
+    this.currentNodeIndex = 0;
 
     this.hooks = {
       onNodeUpdate: options.onNodeUpdate || (() => {}),
@@ -124,6 +126,26 @@ class NodePulse {
     if (levels.indexOf(level) <= levels.indexOf(this.options.logLevel)) {
       this.logger[level](...args);
     }
+  }
+
+  deepMerge(target, source) {
+    if (typeof source !== 'object' || source === null) {
+      return source;
+    }
+    const output = { ...target };
+    Object.keys(source).forEach(key => {
+      if (source[key] instanceof Array) {
+        output[key] = source[key];
+      } else if (typeof source[key] === 'object') {
+        if (!(key in target))
+          Object.assign(output, { [key]: source[key] });
+        else
+          output[key] = this.deepMerge(target[key], source[key]);
+      } else {
+        Object.assign(output, { [key]: source[key] });
+      }
+    });
+    return output;
   }
 }
 
